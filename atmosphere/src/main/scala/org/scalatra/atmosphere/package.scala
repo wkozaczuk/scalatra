@@ -33,13 +33,6 @@ package object atmosphere {
   val ActorSystemKey = "org.scalatra.atmosphere.ActorSystem"
   val TrackMessageSize = "org.scalatra.atmosphere.TrackMessageSize"
 
-  import org.scalatra.servlet.ServletApiImplicits._
-
-  implicit def atmoResourceWithClient(res: AtmosphereResource) = new {
-    def clientOption = res.session.get(AtmosphereClientKey).asInstanceOf[Option[AtmosphereClient]]
-    def client = res.session.apply(AtmosphereClientKey).asInstanceOf[AtmosphereClient]
-  }
-
   private[atmosphere] implicit def jucFuture2akkaFuture[T](javaFuture: java.util.concurrent.Future[T])(implicit system: ActorSystem): Future[T] = {
     implicit val execContext = system.dispatcher
     val promise = Promise[T]()
