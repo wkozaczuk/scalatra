@@ -1,10 +1,11 @@
 package org.scalatra
 
+import org.atmosphere.cpr.{AtmosphereResourceSessionFactory, AtmosphereResourceSession, AtmosphereResource}
+
 import scala.concurrent.Future
 import scala.concurrent.Promise
 import scala.concurrent.duration._
 import _root_.akka.actor.ActorSystem
-import org.atmosphere.cpr.AtmosphereResource
 import scala.util.control.Exception._
 
 package object atmosphere {
@@ -33,11 +34,15 @@ package object atmosphere {
   val ActorSystemKey = "org.scalatra.atmosphere.ActorSystem"
   val TrackMessageSize = "org.scalatra.atmosphere.TrackMessageSize"
 
-  import org.scalatra.servlet.ServletApiImplicits._
+  implicit def atmoResourceWithClient(resource: AtmosphereResource) = new {
+    def clientOption:Option[AtmosphereClient] = resolveAtmosphereResourceSessionOption(resource)
+      .flatMap(s => Option(s.getAttribute(org.scalatra.atmosphere.AtmosphereClientKey)))
+      .map(_.asInstanceOf[AtmosphereClient])
 
-  implicit def atmoResourceWithClient(res: AtmosphereResource) = new {
-    def clientOption = res.session.get(AtmosphereClientKey).asInstanceOf[Option[AtmosphereClient]]
-    def client = res.session.apply(AtmosphereClientKey).asInstanceOf[AtmosphereClient]
+    private def resolveAtmosphereResourceSessionOption(resource: AtmosphereResource): Option[AtmosphereResourceSession] = {
+      Option(resource).flatMap(r => Option(AtmosphereResourceSessionFactory.getDefault.getSession(r, false)))
+    }
+
   }
 
   private[atmosphere] implicit def jucFuture2akkaFuture[T](javaFuture: java.util.concurrent.Future[T])(implicit system: ActorSystem): Future[T] = {
@@ -60,6 +65,4 @@ package object atmosphere {
       }
     }
   }
-
-//  private[atmoshpere] val atmoScheduler = Executors.newScheduledThreadPool(1)
 }

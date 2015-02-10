@@ -45,8 +45,9 @@ final class RedisScalatraBroadcaster()(implicit wireFormat: WireFormat, protecte
       val newMsg = filter(embeddedMsg)
 
       if (newMsg != null) {
-        val selectedResources = _resources.asScala map (_.client) filter clientFilter
-        val selectedSet = selectedResources.map(_.resource).toSet.asJava
+        val atmosphereClients = _resources.asScala map (_.clientOption) filter(_.isDefined) map (_.get)
+        val selectedAtmosphereClients = atmosphereClients filter clientFilter
+        val selectedSet = selectedAtmosphereClients.map(_.resource).toSet.asJava
         push(new Entry(newMsg, selectedSet, new BroadcasterFuture[Any](newMsg), embeddedMsg))
       }
     } catch {
