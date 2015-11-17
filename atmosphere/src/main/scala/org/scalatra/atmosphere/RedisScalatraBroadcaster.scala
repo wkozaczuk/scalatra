@@ -22,8 +22,7 @@ final class RedisScalatraBroadcaster()(implicit wireFormat: WireFormat, protecte
   protected var _wireFormat: WireFormat = wireFormat
   implicit val formats = Serialization.formats(ShortTypeHints(List(classOf[Everyone], classOf[OnlySelf], classOf[SkipSelf])))
 
-  override def broadcast[T <: OutboundMessage](msg: T, clientFilter: ClientFilter)
-                                              (implicit executionContext: ExecutionContext): Future[T] = {
+  override def broadcast[T <: OutboundMessage](msg: T, clientFilter: ClientFilter): java.util.concurrent.Future[AnyRef] = {
     logger.info("Resource [%s] sending message to [%s] with contents:  [%s]".format(clientFilter.uuid, clientFilter, msg))
     // Casting to ProtocolMessage because when writing the message everything gets wrapped by a 'content' element.
     // This seems to be because the actual message is a ProtocolMessage which defines a 'content' method.
@@ -33,7 +32,7 @@ final class RedisScalatraBroadcaster()(implicit wireFormat: WireFormat, protecte
     val wrappedMessage = new Message(actualMessage, clientFilter)
     val wrappedMessageString = write(wrappedMessage)
 
-    broadcast(wrappedMessageString).map(_ => msg)
+    broadcast(wrappedMessageString)
   }
 
   override protected def broadcastReceivedMessage(message: AnyRef) {
