@@ -1,6 +1,6 @@
 package org.scalatra.swagger.reflect
 
-import tools.scalap.scalax.rules.scalasig._
+import org.json4s.scalap.scalasig._
 import annotation.tailrec
 
 private[reflect] object ScalaSigReader {

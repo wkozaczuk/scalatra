@@ -357,7 +357,7 @@ object ScalatraBuild extends Build {
 
     private val jettyVersion = "9.2.1.v20140609"
 
-    private val json4sVersion = "3.2.10"
+    private val json4sVersion = "3.3.0"
 
     private val scalateArtifact: String => String = {
       case sv if sv startsWith "2.8."   => "scalate-core"

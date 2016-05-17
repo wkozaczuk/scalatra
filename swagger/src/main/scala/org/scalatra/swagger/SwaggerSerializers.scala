@@ -42,6 +42,7 @@ object SwaggerSerializers {
   }
   trait SwaggerFormats extends DefaultFormats {
     private[this] val self = this
+    val strict: Boolean = false
     def withAuthorizationTypeSerializer(serializer: Serializer[AuthorizationType]): SwaggerFormats = new SwaggerFormats {
       override val customSerializers: List[Serializer[_]] = serializer :: SwaggerFormats.serializers
     }
